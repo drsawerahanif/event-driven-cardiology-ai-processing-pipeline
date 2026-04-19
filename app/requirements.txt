@@ -1,1 +1,6 @@
-
+fastapi
+uvicorn
+jinja2
+sqlalchemy
+google-genai
+python-multipart
