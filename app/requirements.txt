@@ -4,3 +4,4 @@ jinja2
 sqlalchemy
 google-genai
 python-multipart
+python-dotenv
