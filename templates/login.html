@@ -1,1 +1,341 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Sign in | Clinical AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        --bg: #fbf7f2; /* warm off-white */
+        --panel: #ffffff;
+        --border: #e9e2d9;
+        --text: #1f2937; /* slate-800 */
+        --muted: #6b7280; /* slate-500 */
+        --accent: #1d4ed8; /* calm blue */
+        --accent2: #0ea5a5; /* soft teal */
+        --soft: #f4efe8;
+        --shadow: 0 18px 50px rgba(31, 41, 55, 0.1);
+        --radius: 18px;
+      }
 
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Arial,
+          "Noto Sans";
+        color: var(--text);
+        background:
+          radial-gradient(
+            900px 600px at 10% 10%,
+            rgba(14, 165, 165, 0.12),
+            transparent 55%
+          ),
+          radial-gradient(
+            900px 600px at 90% 20%,
+            rgba(29, 78, 216, 0.1),
+            transparent 55%
+          ),
+          var(--bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 34px 14px;
+      }
+
+      .layout {
+        width: min(1040px, 100%);
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 18px;
+      }
+      @media (max-width: 960px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .hero,
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .hero {
+        padding: 26px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .logo {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        background: linear-gradient(
+          135deg,
+          rgba(14, 165, 165, 0.18),
+          rgba(29, 78, 216, 0.12)
+        );
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .brand strong {
+        display: block;
+        font-size: 16px;
+        letter-spacing: -0.2px;
+      }
+      .brand span {
+        display: block;
+        font-size: 13.5px;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+
+      h1 {
+        margin: 10px 0 10px;
+        font-size: 36px; /* bigger */
+        line-height: 1.15;
+        letter-spacing: -0.8px;
+      }
+      p {
+        margin: 0 0 14px;
+        color: var(--muted);
+        font-size: 16px; /* bigger */
+        line-height: 1.65;
+        max-width: 62ch;
+      }
+
+      .flow {
+        margin-top: 16px;
+        display: grid;
+        gap: 12px;
+      }
+      .step {
+        display: flex;
+        gap: 12px;
+        padding: 14px;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        background: var(--soft);
+        align-items: flex-start;
+      }
+      .num {
+        width: 30px;
+        height: 30px;
+        border-radius: 12px;
+        background: #fff;
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        color: var(--accent);
+        flex: 0 0 auto;
+      }
+      .step strong {
+        font-size: 15.5px;
+        letter-spacing: -0.2px;
+      }
+      .step div {
+        margin-top: 4px;
+        font-size: 14.5px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .card {
+        padding: 22px;
+        align-self: start;
+      }
+      .card h2 {
+        margin: 0 0 6px;
+        font-size: 20px; /* bigger */
+        letter-spacing: -0.3px;
+      }
+      .card .sub {
+        margin: 0 0 16px;
+        color: var(--muted);
+        font-size: 15px; /* bigger */
+        line-height: 1.6;
+      }
+
+      label {
+        display: block;
+        margin: 0 0 8px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      /* Dropdown readability fix */
+      select {
+        width: 100%;
+        padding: 12px 12px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: #ffffff;
+        color: var(--text);
+        outline: none;
+        font-size: 16px;
+      }
+      select:focus {
+        border-color: rgba(29, 78, 216, 0.45);
+        box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.12);
+      }
+
+      .btn {
+        margin-top: 14px;
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 14px;
+        border: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(29, 78, 216, 0.95),
+          rgba(29, 78, 216, 0.78)
+        );
+        color: #ffffff;
+        font-weight: 900;
+        font-size: 16px;
+        cursor: pointer;
+        transition:
+          transform 0.12s ease,
+          filter 0.12s ease;
+      }
+      .btn:hover {
+        filter: brightness(1.03);
+        transform: translateY(-1px);
+      }
+      .btn:active {
+        transform: translateY(0px);
+      }
+
+      .error {
+        margin-top: 14px;
+        padding: 12px 12px;
+        border-radius: 14px;
+        border: 1px solid rgba(220, 38, 38, 0.22);
+        background: rgba(220, 38, 38, 0.06);
+        color: #7f1d1d;
+        font-size: 14.5px;
+        line-height: 1.5;
+      }
+
+      .note {
+        margin-top: 18px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 13.5px;
+        line-height: 1.45;
+      }
+      code {
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        background: #fff;
+        border: 1px solid var(--border);
+        padding: 2px 7px;
+        border-radius: 10px;
+        color: var(--text);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <section class="hero">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10Z"
+                stroke="#1f2937"
+                stroke-width="2"
+              />
+              <path
+                d="M6.5 12h3l1.2-2.2L12.2 15l1.1-2h4.2"
+                stroke="#0ea5a5"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+          <div>
+            <strong>Clinical AI Dashboard</strong>
+            <span>Prompt retrieval → LLM response demo</span>
+          </div>
+        </div>
+
+        <h2>Sign in to continue</h2>
+        <p>
+          Choose a user ID. The backend fetches the mapped prompt from SQLite,
+          sends it to the LLM, and shows the response here.
+        </p>
+
+        <div class="flow">
+          <div class="step">
+            <div class="num">1</div>
+            <div>
+              <strong>Select user ID</strong>
+              <div>Frontend submits the ID to the backend</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="num">2</div>
+            <div>
+              <strong>Fetch prompt from database</strong>
+              <div>Backend retrieves the mapped prompt from SQLite</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="num">3</div>
+            <div>
+              <strong>Generate and display response</strong>
+              <div>Prompt goes to LLM → response returns to the dashboard</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="note">Debug endpoint: <code>/debug-env</code></div>
+      </section>
+
+      <section class="card">
+        <h2>User Login</h2>
+        <div class="sub">
+          Select an available user ID (seeded in the database) to start.
+        </div>
+
+        <form action="/login" method="post">
+          <label for="user_id">User ID</label>
+          <select name="user_id" id="user_id" required>
+            <option value="1">User 1</option>
+            <option value="2">User 2</option>
+            <option value="3">User 3</option>
+          </select>
+
+          <button class="btn" type="submit">Continue</button>
+        </form>
+
+        {% if error %}
+        <div class="error"><strong>Error:</strong> {{ error }}</div>
+        {% endif %}
+      </section>
+    </div>
+  </body>
+</html>
