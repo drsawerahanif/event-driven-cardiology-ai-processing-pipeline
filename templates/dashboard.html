@@ -1,1 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Clinical AI Dashboard</title>
+  <style>
+    :root{
+      --bg1:#fff7f0;
+      --bg2:#f3fff9;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --border:#e7dfd7;
+      --shadow: 0 18px 55px rgba(31,41,55,.10);
+      --accent:#2f7a5a;
+      --accent2:#e07a4f;
+      --chip:#fff;
+      --chipBorder:#e7dfd7;
+      --soft:#f7efe8;
+      --soft2:#eef8f3;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 15% 10%, rgba(224,122,79,.18), transparent 55%),
+        radial-gradient(1000px 700px at 85% 15%, rgba(47,122,90,.16), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+      padding:28px;
+    }
+    .container{
+      width:min(1100px, 100%);
+      margin:0 auto;
+    }
+    .topbar{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
+    }
+    .titleCard{
+      flex:1 1 auto;
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      padding:20px 22px;
+    }
+    h1{
+      margin:0 0 10px;
+      font-size:30px;
+      letter-spacing:-.02em;
+    }
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    .chip{
+      background:var(--chip);
+      border:1px solid var(--chipBorder);
+      border-radius:999px;
+      padding:8px 12px;
+      color:var(--muted);
+      font-size:14px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .dot{
+      width:9px; height:9px;
+      border-radius:99px;
+      background: var(--accent);
+      display:inline-block;
+    }
 
+    .logout{
+      flex:0 0 auto;
+      text-decoration:none;
+      background:linear-gradient(180deg, #e07a4f, #cf6b43);
+      color:white;
+      font-weight:800;
+      font-size:15px;
+      padding:12px 16px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.05);
+      box-shadow: 0 14px 30px rgba(224,122,79,.25);
+      align-self:flex-start;
+    }
+    .logout:hover{ filter:brightness(1.02); }
+
+    .grid{
+      display:grid;
+      gap:16px;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      padding:18px 20px;
+    }
+    .label{
+      color:var(--muted);
+      font-size:12px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom:10px;
+    }
+
+    .promptBox{
+      background:linear-gradient(180deg, var(--soft), #fff);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px 14px;
+      font-size:18px;
+      line-height:1.6;
+    }
+
+    .responseBox{
+      background:linear-gradient(180deg, var(--soft2), #fff);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:16px 16px;
+      font-size:17px;
+      line-height:1.65;
+    }
+
+    pre{
+      margin:0;
+      white-space:pre-wrap;
+      word-wrap:break-word;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:16px; /* bigger */
+      line-height:1.7;
+    }
+
+    .footerNote{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:13px;
+      padding-top:12px;
+      border-top:1px solid var(--border);
+    }
+
+    @media (max-width: 720px){
+      body{ padding:18px; }
+      .topbar{ flex-direction:column; }
+      .logout{ width:max-content; }
+      .promptBox{ font-size:17px; }
+      .responseBox{ font-size:16px; }
+      pre{ font-size:15px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div class="titleCard">
+        <h1>Clinical AI Dashboard</h1>
+        <div class="chips">
+          <span class="chip"><span class="dot"></span><b>User:</b> {{ user_id }}</span>
+          <span class="chip"><span class="dot"></span><b>Mode:</b> {{ mode }}</span>
+          <span class="chip"><b>Model:</b> {{ model_id }}</span>
+        </div>
+      </div>
+
+      <a class="logout" href="/">Logout</a>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="label">Prompt fetched from database</div>
+        <div class="promptBox">{{ prompt_text }}</div>
+      </div>
+
+      <div class="card">
+        <div class="label">LLM response</div>
+        <div class="responseBox">
+          <pre>{{ response }}</pre>
+        </div>
+
+        <div class="footerNote">
+          Informational output only. Not a diagnosis or treatment plan. Seek urgent care for severe symptoms.
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
