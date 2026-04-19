@@ -1,1 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Prompt by ID → LLM Response</title>
+</head>
+<body>
+  <h2>Select Prompt ID</h2>
 
+  <form action="/generate" method="post">
+    <label for="prompt_id">Prompt ID:</label>
+    <select name="prompt_id" id="prompt_id">
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+    </select>
+
+    <button type="submit">Generate</button>
+  </form>
+
+  {% if chosen_id %}
+    <p><strong>Selected ID:</strong> {{ chosen_id }}</p>
+  {% endif %}
+
+  {% if prompt_text %}
+    <p><strong>Prompt from DB:</strong> {{ prompt_text }}</p>
+  {% endif %}
+
+  {% if response %}
+    <h3>LLM Response</h3>
+    <pre style="white-space: pre-wrap;">{{ response }}</pre>
+  {% endif %}
+
+  {% if error %}
+    <p style="color: red;"><strong>Error:</strong> {{ error }}</p>
+  {% endif %}
+</body>
+</html>
