@@ -1,5 +1,3 @@
-# event-driven-cardiology-ai-processing-pipeline
-
 # Event-Driven AI Processing Pipeline (S3 + Lambda + FastAPI)
 
 ## Overview
