@@ -1,87 +1,77 @@
 import json
-import os
-import urllib.parse
-import urllib.request
-
 import boto3
+import urllib.request
+import os
 
-s3 = boto3.client("s3")
+s3 = boto3.client('s3')
 
-BACKEND_API_URL = os.environ["BACKEND_API_URL"]
+BACKEND_API_URL = os.environ.get("BACKEND_API_URL")
 BACKEND_API_KEY = os.environ.get("BACKEND_API_KEY")
-OUTPUT_BUCKET = os.environ.get("OUTPUT_BUCKET")
-
-
-def call_backend_api(prompt_text):
-    payload = json.dumps({"prompt": prompt_text}).encode("utf-8")
-
-    headers = {
-        "Content-Type": "application/json"
-    }
-
-    if BACKEND_API_KEY:
-        headers["x-api-key"] = BACKEND_API_KEY
-
-    request = urllib.request.Request(
-        BACKEND_API_URL,
-        data=payload,
-        headers=headers,
-        method="POST"
-    )
-
-    with urllib.request.urlopen(request, timeout=30) as response:
-        response_body = response.read().decode("utf-8")
-        return json.loads(response_body)
-
 
 def lambda_handler(event, context):
     results = []
 
-    for record in event.get("Records", []):
-        bucket_name = record["s3"]["bucket"]["name"]
-        object_key = urllib.parse.unquote_plus(record["s3"]["object"]["key"])
+    try:
+        for record in event['Records']:
+            bucket = record['s3']['bucket']['name']
+            key = record['s3']['object']['key']
 
-        if not object_key.endswith(".txt"):
-            results.append({
-                "key": object_key,
-                "status": "skipped",
-                "reason": "Not a .txt file"
-            })
-            continue
+            print(f"Processing file: {key}")
 
-        try:
-            s3_response = s3.get_object(Bucket=bucket_name, Key=object_key)
-            prompt_text = s3_response["Body"].read().decode("utf-8").strip()
+            # Read file from S3
+            response = s3.get_object(Bucket=bucket, Key=key)
+            prompt = response['Body'].read().decode('utf-8')
 
-            response_data = call_backend_api(prompt_text)
-            ai_response = response_data.get("response", "")
+            print("Calling backend API...")
 
-            base_name = object_key.rsplit("/", 1)[-1].rsplit(".", 1)[0]
-            output_key = f"outputs/{base_name}_response.txt"
+            # Prepare request
+            data = json.dumps({"prompt": prompt}).encode("utf-8")
 
-            target_bucket = OUTPUT_BUCKET or bucket_name
+            req = urllib.request.Request(
+                BACKEND_API_URL,
+                data=data,
+                headers={
+                    "Content-Type": "application/json",
+                    "x-api-key": BACKEND_API_KEY
+                },
+                method="POST"
+            )
 
+            # Call backend
+            with urllib.request.urlopen(req) as res:
+                response_data = json.loads(res.read().decode("utf-8"))
+
+            result = response_data.get("response", "No response from backend")
+
+            # Define output path
+            output_key = key.replace("input/", "outputs/").replace(".txt", "_response.txt")
+
+            print(f"Writing output to: {output_key}")
+
+            # Write to S3
             s3.put_object(
-                Bucket=target_bucket,
+                Bucket=bucket,
                 Key=output_key,
-                Body=ai_response.encode("utf-8"),
-                ContentType="text/plain"
+                Body=result.encode('utf-8')
             )
 
             results.append({
-                "input_key": object_key,
+                "input_key": key,
                 "output_key": output_key,
                 "status": "success"
             })
 
-        except Exception as e:
-            results.append({
-                "key": object_key,
+        return {
+            "statusCode": 200,
+            "body": json.dumps(results)
+        }
+
+    except Exception as e:
+        print(f"[ERROR] {str(e)}")
+        return {
+            "statusCode": 200,
+            "body": json.dumps({
                 "status": "error",
                 "error": str(e)
             })
-
-    return {
-        "statusCode": 200,
-        "body": json.dumps(results)
-    }
+        }
