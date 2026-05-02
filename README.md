@@ -191,7 +191,7 @@ Here's a simple breakdown:
 **Dr. Sawera Hanif**  
 Preventive Cardiologist | Data Scientist | Clinical AI & Data Engineering
 
-Built as part of DevOps coursework to demonstrate:
+Built as part of DevOps coursework taught by Sir Azhar-ul-Islam at IBA in Spring 2026 to demonstrate:
 
 - Event-driven architecture using AWS (S3, Lambda)
 - Serverless-triggered backend processing
