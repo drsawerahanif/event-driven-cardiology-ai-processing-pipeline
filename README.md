@@ -16,14 +16,24 @@ A `.txt` file uploaded to Amazon S3 automatically triggers a Lambda function, wh
 
 ## Architecture
 ![Pipeline Architecture](docs/Event-Driven AI Pipeline Architecture.png)
+
+
 S3 (input/)
+      
       ↓
+
 Lambda (triggered on upload)
+      
       ↓
+
 FastAPI backend (EC2)
+      
       ↓
+
 Gemini API (LLM)
+
       ↓
+
 S3 (outputs/)
 
 
