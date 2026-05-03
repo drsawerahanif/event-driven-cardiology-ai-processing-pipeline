@@ -1,3 +1,7 @@
+import time
+from urllib import request
+import uuid
+import boto3
 import logging
 import os
 
@@ -20,6 +24,9 @@ templates = Jinja2Templates(directory="templates")
 
 init_db()
 
+S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
+s3_client = boto3.client("s3") if S3_BUCKET_NAME else None
+
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 BACKEND_API_KEY = os.getenv("BACKEND_API_KEY")
 GEMINI_MODEL_ID = "models/gemini-2.5-flash"
@@ -29,6 +36,43 @@ gemini_client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 
 class PromptRequest(BaseModel):
     prompt: str
+
+
+def upload_prompt_to_s3(prompt_text: str, user_id: int) -> tuple[str, str]:
+    if s3_client is None:
+        raise RuntimeError("S3 client is not configured. Check S3_BUCKET_NAME.")
+
+    request_id = str(uuid.uuid4())[:8]
+    input_key = f"input/user_{user_id}_{request_id}.txt"
+    output_key = f"outputs/user_{user_id}_{request_id}_response.txt"
+
+    s3_client.put_object(
+        Bucket=S3_BUCKET_NAME,
+        Key=input_key,
+        Body=prompt_text.encode("utf-8"),
+        ContentType="text/plain"
+    )
+
+    return input_key, output_key
+
+
+def wait_for_s3_output(output_key: str, timeout_seconds: int = 40) -> str:
+    if s3_client is None:
+        raise RuntimeError("S3 client is not configured. Check S3_BUCKET_NAME.")
+
+    start_time = time.time()
+
+    while time.time() - start_time < timeout_seconds:
+        try:
+            response = s3_client.get_object(
+                Bucket=S3_BUCKET_NAME,
+                Key=output_key
+            )
+            return response["Body"].read().decode("utf-8")
+        except s3_client.exceptions.NoSuchKey:
+            time.sleep(2)
+
+    raise TimeoutError(f"Timed out waiting for Lambda output: {output_key}")
 
 
 def mock_llm_response(prompt_text: str, user_id: int | None = None) -> str:
@@ -127,15 +171,20 @@ def login(request: Request, user_id: int = Form(...)):
 
         result = process_prompt_text(row.text, user_id=user_id)
 
+        input_key, output_key = upload_prompt_to_s3(row.text, user_id=user_id)
+        ai_response = wait_for_s3_output(output_key)
+
         return templates.TemplateResponse(
             "dashboard.html",
             {
                 "request": request,
                 "user_id": user_id,
-                "prompt_text": result["prompt"],
-                "response": result["response"],
-                "mode": result["mode"],
-                "model_id": result["model_id"],
+                "prompt_text": row.text,
+                "response": ai_response,
+                "mode": "event-driven",
+                "model_id": GEMINI_MODEL_ID,
+                "input_key": input_key,
+                "output_key": output_key,
             }
         )
 
